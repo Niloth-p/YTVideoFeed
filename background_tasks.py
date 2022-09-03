@@ -30,19 +30,27 @@ def fetch_videos():
         'publishedAfter': last_time,
         'maxResults': 50,
         'order': 'date',
+        'key': os.environ['YOUTUBE_DATA_API_KEY']
     }
 
-    keylist = json.loads(os.environ['YOUTUBE_DATA_API_KEY_LIST'])
-    i = 0
-    while i < len(keylist):
-        try:
-            params['key'] = keylist[i]
-            response = requests.get(search_url, params=params, timeout=10)
-            response.raise_for_status()
-            vids = response.json()['items']
-            save_details(vids, last_time)
-        except requests.HTTPError as e:
-            i = i + 1
+    try:
+        response = requests.get(search_url, params=params, timeout=10)
+        response.raise_for_status()
+        vids = response.json()['items']
+        save_details(vids, last_time)
+    except requests.HTTPError as e:
+        print(e)
+    # keylist = json.loads(os.environ['YOUTUBE_DATA_API_KEY_LIST'])
+    # i = 0
+    # while i < len(keylist):
+    #     try:
+    #         params['key'] = keylist[i]
+    #         response = requests.get(search_url, params=params, timeout=10)
+    #         response.raise_for_status()
+    #         vids = response.json()['items']
+    #         save_details(vids, last_time)
+    #     except requests.HTTPError as e:
+    #         i = i + 1
 
 
 def save_details(vids, last_time):
