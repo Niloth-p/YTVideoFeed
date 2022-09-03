@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  db:
+    container_name: postgres-compose
+    image: postgres
+    ports:
+      - 5000:5432
+    networks:
+      - compose-network
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+  web:
+    container_name: videofeeder-compose
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - compose-network
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=postgres-compose
+      - MYNAME=VideoFeeder
+    env_file: .env
+networks:
+  compose-network:
+    name: videofeeder-network
