@@ -48,9 +48,11 @@ def save_details(vids, last_time):
         if last_time == vid['snippet']['publishedAt']:
             continue
         search_url = 'http://127.0.0.1:8000/' + os.environ['TOPIC'] + '/'
+        vid_id = vid['id']['videoId']
         vid = vid['snippet']
         data = {
             'title': vid['title'],
+            'url': 'https://www.youtube.com/watch?v=' + vid_id,
             'description': vid['description'],
             'published_at': vid['publishedAt'],
             'channel_title': vid['channelTitle'],

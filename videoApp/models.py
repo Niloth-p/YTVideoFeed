@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 class Video(models.Model):
     title = models.CharField(max_length=200)
+    url = models.URLField(max_length=100, blank=True)
     description = models.CharField(max_length=1000, blank=True)
     published_at = models.CharField(max_length=30)
     channel_title = models.CharField(max_length=200)
