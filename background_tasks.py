@@ -8,7 +8,7 @@ from videoFeeder import settings
 
 def get_last_time():
     """Find the time the latest video in our DB was published"""
-    search_url = "http://127.0.0.1:8000/" + os.environ['TOPIC']
+    search_url = "http://127.0.0.1:8000/" + os.environ['TOPIC'] + '/'
     resp = requests.get(search_url, timeout=10)
     if(len(resp.json()['results'])) == 0:
         last_time = '2022-06-01T00:00:00Z'
@@ -40,17 +40,6 @@ def fetch_videos():
         save_details(vids, last_time)
     except requests.HTTPError as e:
         print(e)
-    # keylist = json.loads(os.environ['YOUTUBE_DATA_API_KEY_LIST'])
-    # i = 0
-    # while i < len(keylist):
-    #     try:
-    #         params['key'] = keylist[i]
-    #         response = requests.get(search_url, params=params, timeout=10)
-    #         response.raise_for_status()
-    #         vids = response.json()['items']
-    #         save_details(vids, last_time)
-    #     except requests.HTTPError as e:
-    #         i = i + 1
 
 
 def save_details(vids, last_time):
@@ -58,7 +47,7 @@ def save_details(vids, last_time):
     for vid in vids:
         if last_time == vid['snippet']['publishedAt']:
             continue
-        search_url = "http://127.0.0.1:8000/tutorial/"
+        search_url = 'http://127.0.0.1:8000/' + os.environ['TOPIC'] + '/'
         vid = vid['snippet']
         data = {
             'title': vid['title'],
