@@ -35,13 +35,14 @@ Verify the deployment by navigating to your server address in your preferred bro
 It will take 60 seconds for the first batch of data to come in.
 
 ## Limits
-The API refreshes with upto 50 new videos every 60 seconds.
+The API refreshes with upto 50 new videos every 60 seconds.  
 An API key is limited to 100 public calls per day, as of now.
 
 ## Working Details
 1. A paginated viewset handles the endpoint along with searching and pagination features.
 2. YouTube's Data API is used to fetch the video details from YouTube.
-3. To run an infinite periodical background process, we would ideally need websockets. We would need Redis for that. We could use Celery or Huey in addition to create such a process.
+3. To run an infinite periodical background process, we would ideally need websockets. We would need Redis for that.  
+We could use Celery or Huey in addition to create such a process.
     1. I have bypassed them by using Docker to host background scripts that periodically ping the YouTube API and ingests the data into my REST API using POST requests
 
 ## Scripts
