@@ -36,19 +36,37 @@ Verify the deployment by navigating to your server address in your preferred bro
 It will take 60 seconds for the first batch of data to come in.
 Once the data starts coming in, you can peruse and click on any of the URLs to view the video in youtube.
 
-## Limits
+## Assumptions
+- The topic is pre-specified as an environment variable
+- No authentication is required
+
+## Limitations
 The API refreshes with upto 50 new videos every 60 seconds.  
 An API key is limited to 100 public calls per day, as of now.
+
+## Implemented features
+- viewset - GET/POST/PUT/DELETE endpoint of YT videos
+- search endpoint 
+- YT videos fetched in the background continuously
+- YT video details stored in PostgreSQL database
+- pagination 
+- videos sorted in reverse chronological order
+- dockerized
+- support for cycling through multiple API keys
+- choose topic by setting it as an environment variable
+
+## Design Decisions
+- To run an infinite periodical background process, we would ideally need websockets. We would need Redis for that.  
+We could use Celery or Huey in addition to create such scheduled jobs.
+    - I have bypassed them by using Docker to host background bash and python scripts that periodically ping the YouTube API and ingests the data into my REST API using POST requests
+- Limit Offset Pagination
 
 ## Working Details
 1. A paginated viewset handles the endpoint along with searching and pagination features.
 2. YouTube's Data API is used to fetch the video details from YouTube.
-3. To run an infinite periodical background process, we would ideally need websockets. We would need Redis for that.  
-We could use Celery or Huey in addition to create such a process.
-    1. I have bypassed them by using Docker to host background scripts that periodically ping the YouTube API and ingests the data into my REST API using POST requests
 4. Given multiple API keys, the script will start using the first one. When the HTTP response returns an error, it will use the next key in the list, until all keys have been attempted. If none of the keys work, it will sleep for 60 seconds and try again from the first key.
 
-## Scripts
+### Scripts
 1. Dockerfile calls docker-entrypoint.sh.
 2. docker-entrypoint.sh runs manage.py commands.
 It also calls fetch.sh.
@@ -58,3 +76,8 @@ It also calls fetch.sh.
     2. fetch_videos() connects to the YouTube API and gets the data
     3. save_details() saves video details to the DB through POST requests
 
+## Future enhancements
+- Replace limit offset pagination with a faster pagination technique
+- Use scheduled jobs for fetching videos instead
+- Add user profiles and authentication
+- Add support for multiple separate topics
