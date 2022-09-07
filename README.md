@@ -3,17 +3,18 @@
 YTVideoFeed is a simple REST API that gets the latest videos' details on YouTube under a pre-specified topic.  
 It does not get the videos, but the details of the videos and their link - title, description, channel name, url.
 
-## Endpoint:
+## Tech stack
+Django Rest Framework, PostgreSQL, Docker, YouTube Data API
+
+## Endpoint
 ```sh
 /<topic>/           lists details of recent videos (most recent first)
 /<topic>/?search    allows searching the details of all the collected videos
 ```
 
-## Installation:
+## Installation
 
-### Tech stack: 
-#### Django Rest Framework, postgresql, Docker
-Install the dependencies
+Install Docker
 
 ### Clone
 Before cloning, you might want to set 'git config --global core.autocrlf false' if on Windows.
@@ -47,19 +48,22 @@ An API key is limited to 100 public calls per day, as of now.
 ## Implemented features
 - viewset - GET/POST/PUT/DELETE endpoint of YT videos
 - search endpoint 
-- YT videos fetched in the background continuously
+- YT videos fetched in the background continuously using YouTube Data API
 - YT video details stored in PostgreSQL database
 - pagination 
 - videos sorted in reverse chronological order
 - dockerized
 - support for cycling through multiple API keys
 - choose topic by setting it as an environment variable
+- get the time of most recently published video in our database
+    - to set as the publishedAfter field in YT API
 
 ## Design Decisions
 - To run an infinite periodical background process, we would ideally need websockets. We would need Redis for that.  
 We could use Celery or Huey in addition to create such scheduled jobs.
     - I have bypassed them by using Docker to host background bash and python scripts that periodically ping the YouTube API and ingests the data into my REST API using POST requests
 - Limit Offset Pagination
+- When the server is running continuously well, we know the last fetch would have occurred 60 seconds ago, but if the server is being restarted or a connection is restored after a break, we would need to set the lower bound limit to the last fetched video. Hence, I am getting the time of the most recently fetched videoo and using it as publishedAfter field to get videos published after that time.
 
 ## Working Details
 1. A paginated viewset handles the endpoint along with searching and pagination features.
