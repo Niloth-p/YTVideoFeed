@@ -245,3 +245,5 @@ pyvenv.cfg
 pip-selfcheck.json
 
 database.ini
+
+migrations/
