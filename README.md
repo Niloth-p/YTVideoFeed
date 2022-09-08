@@ -4,7 +4,10 @@ YTVideoFeed is a simple REST API that gets the latest videos' details on YouTube
 It does not get the videos, but the details of the videos and their link - title, description, channel name, url.
 
 ## Tech stack
-Django Rest Framework, PostgreSQL, Docker, YouTube Data API
+- Django Rest Framework
+- PostgreSQL
+- Docker
+- YouTube Data API
 
 ## Endpoint
 ```sh
@@ -59,9 +62,8 @@ An API key is limited to 100 public calls per day, as of now.
     - to set as the publishedAfter field in YT API
 
 ## Design Decisions
-- To run an infinite periodical background process, we would ideally need websockets. We would need Redis for that.  
-We could use Celery or Huey in addition to create such scheduled jobs.
-    - I have bypassed them by using Docker to host background bash and python scripts that periodically ping the YouTube API and ingests the data into my REST API using POST requests
+- I have used Advanced Python Scheduler to schedule the background process that fetches the YT videos.
+    - I had previously used bash and python scripts that periodically ping the YouTube API and ingests the data into my REST API using POST requests. But using the APScheduler is not only faster without using POST requests, but also simple and scalable.
 - Limit Offset Pagination
 - When the server is running continuously well, we know the last fetch would have occurred 60 seconds ago, but if the server is being restarted or a connection is restored after a break, we would need to set the lower bound limit to the last fetched video. Hence, I am getting the time of the most recently fetched videoo and using it as publishedAfter field to get videos published after that time.
 
@@ -70,16 +72,20 @@ We could use Celery or Huey in addition to create such scheduled jobs.
 2. YouTube's Data API is used to fetch the video details from YouTube.
 4. Given multiple API keys, the script will start using the first one. When the HTTP response returns an error, it will use the next key in the list, until all keys have been attempted. If none of the keys work, it will sleep for 60 seconds and try again from the first key.
 
-### Scripts
-1. Dockerfile calls docker-entrypoint.sh.
-2. docker-entrypoint.sh runs manage.py commands.
-It also calls fetch.sh.
-3. fetch.sh is a background process that calls background_tasks.py every 60 seconds
-4. background_tasks.py has 3 functions.
-    1. get_last_time() fetches the last time video details were fetched
-    2. fetch_videos() connects to the YouTube API and gets the data
-    3. save_details() saves video details to the DB through POST requests
+## Files
+### Fetching
+- ```fetcher.py``` Schedules calls to videoFetchApi.py 
+-  ```videoFetchApi.py``` The fetch logic 
+    - ```get_last_time()``` gets the last time video details were fetched
+    - ```fetch_videos()``` connects to the YouTube API and gets the data
+    - ```save_details()``` saves the fetched video details to the DB
 
+### Demo Images
+- ```BeforeUpdate.jpeg```     Immediately before a fetch op
+- ```AfterUpdate.jpeg```      Immediately after a fetch op, after the BeforeUpdate.jpeg  
+- ```GET.jpeg```              GET request results
+- ```SEARCH.jpeg```           SEARCH api example 
+  
 ## Future enhancements
 - Replace limit offset pagination with a faster pagination technique
 - Use scheduled jobs for fetching videos instead
