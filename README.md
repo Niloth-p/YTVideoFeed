@@ -87,7 +87,16 @@ An API key is limited to 100 public calls per day, as of now.
 - ```SEARCH.jpeg```           SEARCH api example 
   
 ## Future enhancements
-- Replace limit offset pagination with a faster pagination technique
-- Use scheduled jobs for fetching videos instead
+- Replace limit offset pagination with a faster pagination technique that can handle edge cases
+    - use the next page token
+- Use Redis and Celery for fetching videos instead
 - Add user profiles and authentication
 - Add support for multiple separate topics
+- writing better tests
+- add loggers
+- group the docker files
+- deployment
+- make time duration an environment variable as well
+- add feature to save videos offline
+- prevent duplication of videos
+- create indexes for better performance
